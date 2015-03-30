@@ -25,9 +25,16 @@ class TorrentService
         $client = new Client();
         $linkCrawler = $client->request('GET', $node->link()->getUri());
 
-        $movieTitle = $linkCrawler->filter('h1');
-        if($movieTitle){
-            $movieTitle = $movieTitle->text();
+        $imdbTag = $linkCrawler->filter('ul.block.overauto>li:nth-child(3)>a');
+
+        if (!$imdbTag) {
+            return false;
+        }
+        $imdbTag=$imdbTag->text();
+        $this->getImdbInfos($imdbTag);
+        $torrentTitle = $linkCrawler->filter('h1');
+        if($torrentTitle){
+            $torrentTitle = $torrentTitle->text();
         }
 
         $magnet = $linkCrawler->filter('.buttonsline a[title="Magnet link"]');
@@ -51,13 +58,7 @@ class TorrentService
         if ($videoQuality) {
             $videoQuality=$videoQuality->text();
         }
-        $imdbTag = $linkCrawler->filter('ul.block.overauto>li:nth-child(3)>a');
-
-        if ($imdbTag) {
-            $imdbTag=$imdbTag->text();
-            $this->getImdbInfos($imdbTag);
-//            $this->setTorrent($movieTitle,$infoHash,$leechers,$seeders,$videoQuality);
-        }
+//        $this->setTorrentMovie($torrentTitle,$magnet,$infoHash,$leechers,$seeders,$videoQuality,$imdbTag);
 
     }
 
@@ -69,6 +70,10 @@ class TorrentService
         $rating = $linkCrawler->filter('span[itemprop="ratingValue"]');
         if($rating){
             $rating=$rating->text();
+        }
+        $title = $linkCrawler->filter('h1.header span[itemprop="name"]');
+        if($title){
+            $title=$title->text();
         }
 
         $year = $linkCrawler->filter('h1.header span.nobr a');
@@ -93,13 +98,55 @@ class TorrentService
             }
         });
 
+//        $this->setImdbMovie($title,$year,$rating,$director,$numberVotes,$imgUrl);
     }
 
-    public function setTorrent(){
+    public function setImdbMovie($title,$tag,$year,$rating,$director,$numberVotes,$imgUrl){
+        $container = $this->getContainer();
+        $doctrine = $container->get('doctrine');
+
+        $movieRepo=$doctrine->getRepository("AppBundle:Movie");
+        $movie=$movieRepo->findByImdbTag($tag);
+        if(!$movie){
+
+            $movie = new Movie();
+            if(!empty($title) && !empty($year) && !empty($tag) && !empty($rating) && !empty($director) && !empty($numberVotes) && !empty($imgUrl)){
+                $movie->setTitle($title);
+                $movie->setImdbTag($tag);
+                $movie->setYear($year);
+                $movie->setRating($rating);
+                $movie->setDirector($director);
+                $movie->setnumberVotes($numberVotes);
+                $movie->setimgUrl($imgUrl);
+            }
+            $em=$doctrine->getManager();
+            $em->persist($movie);
+            $em->flush();
+        }
+    }
+
+    public function setTorrentMovie($torrentTitle,$magnet,$infoHash,$leechers,$seeders,$videoQuality,$imdbTag){
+        $container = $this->getContainer();
+        $doctrine = $container->get('doctrine');
+
+        $torrentRepo=$doctrine->getRepository('AppBundle:Torrent');
+        $torrent=$torrentRepo->findByInfoHash($infoHash);
+        if(!$torrent){
+            $torrent=new Torrent();
+            if(!empty($torrentTitle) && !empty($magnet) && !empty($infoHash) && !empty($leechers) && !empty($seeders) && !empty($videoQuality) && !empty($imdbTag)){
+                $torrent->setTorrentTitle($torrentTitle);
+                $torrent->setMagnet($magnet);
+                $torrent->setInfoHash($infoHash);
+                $torrent->setLeechers($leechers);
+                $torrent->setSeeders($seeders);
+                $torrent->setVideoQuality($videoQuality);
+                $torrent->setImdbTag($imdbTag);
+            }
+            $em=$doctrine->getManager();
+            $em->persist($torrent);
+            $em->flush();
+        }
 
     }
 
-    public function setImdb(){
-
-    }
 }
