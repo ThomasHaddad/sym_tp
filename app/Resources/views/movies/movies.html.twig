@@ -1,0 +1,5 @@
+{% extends 'movies/homepage.html.twig' %}
+{% block movies %}
+    {{ parent() }}
+    {% include('movies/include-movies.html.twig') %}
+{% endblock %}

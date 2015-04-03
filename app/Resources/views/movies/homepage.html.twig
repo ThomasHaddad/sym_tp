@@ -1,0 +1,70 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    List | {{ parent() }}
+{% endblock %}
+
+{% block main_content %}
+    <h1>Big Moviez</h1>
+
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Movie</th>
+            <th>Title</th>
+            <th>Categories</th>
+            <th>Rating</th>
+            <th>More</th>
+            <th>Actions</th>
+            <th>Already Viewed ?</th>
+        </tr>
+        </thead>
+
+        {% block movies %}
+
+        {% endblock %}
+    </table>
+    <a class="btn btn-default btn-primary btn-lg btn-block" data-start={{ index }} id="more-vids" href="{{ path('getMoreMovies') }}"
+       role="button">View More</a>
+
+
+
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(function () {
+            var $index = $('#more-vids').attr('data-start');
+            $('#more-vids').on('click',function(e){
+                var $self=$(this);
+                e.preventDefault();
+                $.ajax({
+                    url: $self.attr('href')+'/'+$index
+                })
+                        .done(function (data) {
+                            $index= parseInt($index)+10;
+                            console.log($index);
+                            $self.attr('data-start',$index);
+                            $('.table tr').last().after(data);
+                        });
+            });
+
+            $('.movie-status').on('click',function(e){
+                e.preventDefault();
+                if($(this).hasClass('btn-warning')){
+                    var $self=$(this);
+                    $.ajax({
+                        url: $self.attr('href')
+                    })
+                            .done(function (data) {
+                                if(data){
+                                    $self.removeClass('btn-warning');
+                                    $self.addClass('btn-success');
+                                    $self.html('Already Viewed');
+                                }
+                            });
+                }
+            });
+        });
+    </script>
+{% endblock %}

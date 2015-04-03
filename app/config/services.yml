@@ -9,3 +9,4 @@ services:
 #        arguments: ["@another_service_name", "plain_value", "%parameter_name%"]
   torrent_service:
     class: AppBundle\Services\TorrentService
+    arguments: ["@doctrine","@validator"]

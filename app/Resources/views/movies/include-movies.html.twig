@@ -1,0 +1,24 @@
+
+    {% for movie in movies %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td><img src="{{ movie.imgUrl }}" alt=""/></td>
+            <td>{{ movie.title }}</td>
+            <td>
+                {% for cat in movie.categories %}
+                    {{ cat.name }}
+                {% endfor %}
+            </td>
+            <td>{{ movie.rating }} ({{ movie.numberVotes }} users)</td>
+            <td><a class="btn btn-default btn-info" href="{{ path('movieDetails', {'id': movie.id   } ) }}"
+                   role="button">See Torrents</a></td>
+            <td>
+                {% if  movie.isViewed %}
+                    <a class="btn btn-default btn-success movie-status">Already Viewed</a>
+                {% else %}
+                    <a class="btn btn-default btn-warning movie-status" href="{{ path('movieViewed', {'id': movie.id   } ) }}"
+                       role="button">Not Yet</a>
+                {% endif %}
+            </td>
+        </tr>
+    {% endfor %}

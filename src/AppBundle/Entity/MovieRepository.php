@@ -12,4 +12,23 @@ use Doctrine\ORM\EntityRepository;
  */
 class MovieRepository extends EntityRepository
 {
+    public function findMovies($number){
+        $qb=$this->createQueryBuilder("a");
+
+        $query=$qb
+            ->setMaxResults($number)
+            ->getQuery();
+
+        return $query->getResult();
+    }
+    public function findMoreMovies($start,$qty){
+        $qb=$this->createQueryBuilder("a");
+
+        $query=$qb
+            ->setFirstResult($start)
+            ->setMaxResults($qty)
+            ->getQuery();
+
+        return $query->getResult();
+    }
 }

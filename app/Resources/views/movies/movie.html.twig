@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {{ movie.title }} | {{ parent() }}
+{% endblock %}
+
+{% block main_content %}
+    <h1>{{ movie.title }}</h1>
+    <a href="{{ path('homepage') }}">Back</a>
+
+    <div class="container">
+        <img src="{{ movie.imgUrl }}" alt=""/>
+    </div>
+    <div class="torrents">
+        <h2>Torrents :</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>Title</th>
+                <th>Seeders</th>
+                <th>Leechers</th>
+                <th>Quality</th>
+                <th>Download</th>
+            </tr>
+            </thead>
+
+            {% for torrent in movie.torrents %}
+                <tr>
+                    <td>{{ torrent.torrentTitle }}</td>
+                    <td>{{ torrent.seeders }}</td>
+                    <td>{{ torrent.leechers }}</td>
+                    <td>{% if torrent.videoQuality == "Unknown" %}
+                            Unsafe
+                        {% else %}
+                         {{ torrent.videoQuality }}
+                        {% endif %}
+                    </td>
+                    <td><a class="btn btn-default btn-info" href="{{ torrent.magnet }}"
+                           role="button">Download</a></td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+
+
+{% endblock %}
+
