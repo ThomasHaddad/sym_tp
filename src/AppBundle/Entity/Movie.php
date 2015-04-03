@@ -10,6 +10,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @ORM\Table()
  * @ORM\Entity(repositoryClass="AppBundle\Entity\MovieRepository")
+ * @ORM\HasLifeCycleCallbacks()
  */
 class Movie
 {
@@ -78,7 +79,7 @@ class Movie
      * @var boolean
      * @ORM\Column(name="isViewed", type="boolean")
      */
-    private $isViewed=0;
+    private $isViewed;
 
     /**
      * @ORM\OneToMany(targetEntity="AppBundle\Entity\Torrent", mappedBy="movie")
@@ -91,6 +92,14 @@ class Movie
      */
 
     private $categories;
+
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function prePersistCb(){
+        $this->setIsViewed(0);
+    }
 
     /**
      * Get id

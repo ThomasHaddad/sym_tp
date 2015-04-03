@@ -30,7 +30,6 @@ class TorrentService
         $crawler = $crawler
             ->filter('.torrentname .filmType>a:first-child')
             ->reduce(function ($node, $i) {
-                if ($i < 40) {
                     $this->getTorrent($node);
                     if ($this->getTorrent($node)) {
                         $movie = $this->setImdbMovie($this->arrayMovie, $this->arrayCategories);
@@ -40,7 +39,6 @@ class TorrentService
                     } else {
                         return "Movie not in IMDB";
                     }
-                }
             });
         return "Datas retrieved";
     }
